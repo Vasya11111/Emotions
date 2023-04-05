@@ -60,5 +60,19 @@ def db_add_notification_in_table(company_name):
                  "{'angry': 0.0, 'disgust': 0.0, 'fear': 0.0, 'happy': 0.5, 'sad': 0.49, 'surprise': 0.0, 'neutral': 0.01}",
                  0, 74))
 
+
+    for i in range(10):
+        cur.execute("INSERT INTO '{company_name}' (photo_date, photo_time, photo_emotion, sex, age) "
+                    "VALUES(?, ?, ?, ?, ?)".format(company_name=company_name),
+                    ('24/03/2023', '17:00',
+                     "{'angry': 0.0, 'disgust': 0.0, 'fear': 0.5, 'happy': 0, 'sad': 0.49, 'surprise': 0.0, 'neutral': 0.01}",
+                     0, 74))
+    for i in range(10):
+        cur.execute("INSERT INTO '{company_name}' (photo_date, photo_time, photo_emotion, sex, age) "
+                    "VALUES(?, ?, ?, ?, ?)".format(company_name=company_name),
+                    ('29/03/2023', '17:00',
+                     "{'angry': 0.5, 'disgust': 0.0, 'fear': 0, 'happy': 0, 'sad': 0.49, 'surprise': 0.0, 'neutral': 0.01}",
+                     0, 74))
+
     db.commit()
 

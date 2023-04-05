@@ -28,6 +28,10 @@ class Obj:
         self.x = x
         self.y = y
 
+class ObjGraph:
+    def __init__(self, emotion, value):
+        self.emotion = emotion
+        self.value = value
 
 """
     Flask-Restx models for api request and response data
@@ -316,13 +320,14 @@ class GetEmotions(Resource):
 
         _company = req_data.get("company")
 
-       # db_add_notification_in_table(_company)
+      #  db_add_notification_in_table(_company)
 
         user_exists =db_get_all_data(_company)
 
 
         x_counts = {}
         for t in user_exists:
+            print(type(t))
             if t[1] in x_counts:
                 x_counts[t[1]] += 1
             else:
@@ -339,6 +344,72 @@ class GetEmotions(Resource):
         for i in objs_list:
             objs_list[j]=i.__dict__
             j=j+1
+
+
+        return  objs_list, 200
+
+
+
+@rest_api.route('/api/data/graphs')
+class GetGraphs(Resource):
+    def post(self):
+
+
+        email_exists=False
+        password_correct = False
+
+
+        req_data = request.get_json()
+
+        _company = req_data.get("company")
+        _startDate = datetime.strptime(req_data.get("startDate"), '%d/%m/%Y')
+        _endDate = datetime.strptime(req_data.get("endDate"), '%d/%m/%Y')
+
+       # db_add_notification_in_table(_company)
+
+        user_exists =db_get_all_data(_company)
+
+
+        x_counts = {}
+        for t in user_exists:
+
+            if t[1] in x_counts:
+                x_counts[t[1]] += 1
+            else:
+                x_counts[t[1]] = 1
+
+        selected_list = []
+        for t in user_exists:
+            if((_startDate<=datetime.strptime(t[1], '%d/%m/%Y'))and(_endDate>=datetime.strptime(t[1], '%d/%m/%Y'))):
+                selected_list.append(t)
+
+
+        dict_sample = {
+            "angry": 0,
+            "disgust": 0,
+            "fear": 0,
+            'happy': 0,
+            'sad': 0,
+            'surprise': 0,
+            'neutral': 0
+        }
+
+        for t in selected_list:
+            print(t[3])
+            dictionary= json.loads(t[3].replace("'", "\""))
+            print(dictionary)
+            for k, v in dictionary.items():
+                dict_sample[k]+=v
+
+        objs_list=[]
+
+        for k, v in dict_sample.items():
+            objs_list.append(ObjGraph(k, v))
+
+        j = 0
+        for i in objs_list:
+            objs_list[j] = i.__dict__
+            j = j + 1
 
 
         return  objs_list, 200
