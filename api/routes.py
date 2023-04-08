@@ -280,12 +280,20 @@ class Login(Resource):
 
         user_exists =db_get_all_companies()
 
+        _login=0
+        _company_name = 0
+        _info = 0
+
 
         for obj in user_exists:
             if obj[4] == _email:
                 email_exists = True
                 if obj[3]==_password:
                     password_correct = True
+                    _login= obj[2]
+                    _company_name= obj[1]
+                    _info = obj[5]
+
 
 
 
@@ -304,7 +312,7 @@ class Login(Resource):
      #   user_exists.set_jwt_auth_active(True)
       #  user_exists.save()
 
-        return {"success": True}, 200
+        return {"success": True,"login": _login,"company_name": _company_name,"info":_info,"locations":[]}, 200
 
 
 @rest_api.route('/api/data/emotions')
