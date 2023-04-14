@@ -266,31 +266,31 @@ class Login(Resource):
        Login user by taking 'login_model' input and return JWT token
     """
 
-    @rest_api.expect(login_model, validate=True)
+    @rest_api.expect(login_model, validate=False)
     def post(self):
-        email_exists=False
+        login_exists=False
         password_correct = False
 
 
         req_data = request.get_json()
 
-        _email = req_data.get("email")
+        _login = req_data.get("login")
         _password = req_data.get("password")
 
 
         user_exists =db_get_all_companies()
 
-        _login=0
+        _email=0
         _company_name = 0
         _info = 0
 
 
         for obj in user_exists:
-            if obj[4] == _email:
-                email_exists = True
+            if obj[2] == _login:
+                login_exists = True
                 if obj[3]==_password:
                     password_correct = True
-                    _login= obj[2]
+                    _email= obj[4]
                     _company_name= obj[1]
                     _info = obj[5]
 
@@ -298,9 +298,9 @@ class Login(Resource):
 
 
 
-        if not email_exists:
+        if not login_exists:
             return {"success": False,
-                    "msg": "This email does not exist."}, 400
+                    "msg": "This login does not exist."}, 400
 
         if not password_correct:
             return {"success": False,
@@ -312,7 +312,7 @@ class Login(Resource):
      #   user_exists.set_jwt_auth_active(True)
       #  user_exists.save()
 
-        return {"success": True,"login": _login,"company_name": _company_name,"info":_info,"locations":[]}, 200
+        return {"success": True,"email": _email,"company_name": _company_name,"info":_info,"locations":[]}, 200
 
 
 @rest_api.route('/api/data/emotions')
