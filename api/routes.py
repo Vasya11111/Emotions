@@ -283,6 +283,7 @@ class Login(Resource):
         _email=0
         _company_name = 0
         _info = 0
+        _locations = 0
 
 
         for obj in user_exists:
@@ -293,11 +294,14 @@ class Login(Resource):
                     _email= obj[4]
                     _company_name= obj[1]
                     _info = obj[5]
+                    _locations = obj[6]
 
 
 
 
-
+        locations = json.loads(_locations.replace("'", "\""))
+        # print(locations)
+        # print(type(locations))
         if not login_exists:
             return {"success": False,
                     "msg": "This login does not exist."}, 400
@@ -312,7 +316,7 @@ class Login(Resource):
      #   user_exists.set_jwt_auth_active(True)
       #  user_exists.save()
 
-        return {"success": True,"email": _email,"company_name": _company_name,"info":_info,"locations":[]}, 200
+        return {"success": True,"email": _email,"company_name": _company_name,"info":_info,"locations":locations}, 200
 
 
 @rest_api.route('/api/data/emotions')
@@ -355,6 +359,8 @@ class GetEmotions(Resource):
 
 
         return  objs_list, 200
+
+
 
 
 
@@ -424,6 +430,71 @@ class GetGraphs(Resource):
 
 
 
+@rest_api.route('/api/data/graphs/location')
+class GetGraphsLocation(Resource):
+    def post(self):
 
+
+        email_exists=False
+        password_correct = False
+
+
+        req_data = request.get_json()
+
+        _company = req_data.get("company")
+        _location = req_data.get("location")
+        _startDate = datetime.strptime(req_data.get("startDate"), '%d/%m/%Y')
+        _endDate = datetime.strptime(req_data.get("endDate"), '%d/%m/%Y')
+
+       # db_add_notification_in_table(_company)
+
+        user_exists =db_get_all_data(_company)
+
+
+        x_counts = {}
+        for t in user_exists:
+
+            if t[1] in x_counts:
+                x_counts[t[1]] += 1
+            else:
+                x_counts[t[1]] = 1
+
+        selected_list = []
+        for t in user_exists:
+            if((_startDate<=datetime.strptime(t[1], '%d/%m/%Y'))and(_endDate>=datetime.strptime(t[1], '%d/%m/%Y'))):
+                selected_list.append(t)
+
+
+        dict_sample = {
+            "angry": 0,
+            "disgust": 0,
+            "fear": 0,
+            'happy': 0,
+            'sad': 0,
+            'surprise': 0,
+            'neutral': 0
+        }
+
+        for t in selected_list:
+            # print(t[3])
+
+            if t[6] == _location:
+                dictionary= json.loads(t[3].replace("'", "\""))
+                # print(dictionary)
+                for k, v in dictionary.items():
+                    dict_sample[k]+=v
+
+        objs_list=[]
+
+        for k, v in dict_sample.items():
+            objs_list.append(ObjGraph(k, v))
+
+        j = 0
+        for i in objs_list:
+            objs_list[j] = i.__dict__
+            j = j + 1
+
+
+        return  objs_list, 200
 
 
