@@ -37,6 +37,17 @@ def db_get_all_data(company_name):
     """
     notes = cur.execute("SELECT * FROM '{company_name}'".format(company_name=company_name)).fetchall()
     return notes
+
+
+def db_get_all_locations(company_name):
+    db_start()
+    """
+    возвращает данные
+    """
+    notes = cur.execute("SELECT * FROM locations WHERE company_name = '{company_name}'".format(company_name=company_name)).fetchall()
+    return notes
+
+
 def db_get_all_companies():
     db_start()
     """

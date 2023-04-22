@@ -17,7 +17,7 @@ from .models import db, Users, JWTTokenBlocklist
 from .config import BaseConfig
 import requests
 
-from .sqlite import db_start,db_create_company,db_get_all_companies,db_add_notification_in_table,db_get_all_data
+from .sqlite import db_start,db_create_company,db_get_all_companies,db_add_notification_in_table,db_get_all_data,db_get_all_locations
 
 rest_api = Api(version="1.0", title="Users API")
 
@@ -27,6 +27,11 @@ class Obj:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+class Locations:
+    def __init__(self, name, address):
+        self.name = name
+        self.address = address
 
 class ObjGraph:
     def __init__(self, emotion, value):
@@ -284,7 +289,7 @@ class Login(Resource):
         _company_name = 0
         _info = 0
         _locations = 0
-
+        _contacts = 0
 
         for obj in user_exists:
             if obj[2] == _login:
@@ -295,6 +300,7 @@ class Login(Resource):
                     _company_name= obj[1]
                     _info = obj[5]
                     _locations = obj[6]
+                    _contacts = obj[7]
 
 
 
@@ -316,7 +322,33 @@ class Login(Resource):
      #   user_exists.set_jwt_auth_active(True)
       #  user_exists.save()
 
-        return {"success": True,"email": _email,"company_name": _company_name,"info":_info,"locations":locations}, 200
+
+        # objs_list=[]
+        #
+        # for k, v in dict_sample.items():
+        #     objs_list.append(ObjGraph(k, v))
+        #
+        # j = 0
+        # for i in objs_list:
+        #     objs_list[j] = i.__dict__
+        #     j = j + 1
+        print(_company_name)
+        aa = db_get_all_locations(_company_name)
+
+        objs_list = []
+
+        for i in aa:
+            objs_list.append(Locations(name=i[2], address=i[3]))
+
+        j = 0
+        for i in objs_list:
+            objs_list[j] = i.__dict__
+            j = j + 1
+
+        print(aa)
+
+
+        return {"success": True,"email": _email,"company_name": _company_name,"info":_info,"locations":objs_list,"contacts": _contacts }, 200
 
 
 @rest_api.route('/api/data/emotions')
