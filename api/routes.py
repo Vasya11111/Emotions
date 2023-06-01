@@ -634,7 +634,17 @@ class GetEmotions(Resource):
 
         user_exists =db_get_all_data(_company)
 
-        dict_sample = {
+        dict_sample1 = {
+            "angry": 0,
+            "disgust": 0,
+            "fear": 0,
+            'happy': 0,
+            'sad': 0,
+            'surprise': 0,
+            'neutral': 0
+        }
+
+        dict_sample2 = {
             "angry": 0,
             "disgust": 0,
             "fear": 0,
@@ -647,27 +657,40 @@ class GetEmotions(Resource):
 
         for t in user_exists:
 
-            if (str(t[4]) == _sex):
+            if (str(t[4]) == '1'):
                 dictionary = json.loads(t[3].replace("'", "\""))
                 max_key = max(dictionary, key=dictionary.get)
-                dict_sample[max_key] += 1
+                dict_sample1[max_key] += 1
+            else:
+                if (str(t[4]) == '0'):
+                    dictionary = json.loads(t[3].replace("'", "\""))
+                    max_key = max(dictionary, key=dictionary.get)
+                    dict_sample2[max_key] += 1
+
+        objs_list = [0,0]
+
+        objs_list1 = []
+        objs_list2 = []
 
 
-
-
-        objs_list = []
-
-        for k, v in dict_sample.items():
-            objs_list.append(ObjGraph(k, v))
+        for k, v in dict_sample1.items():
+            objs_list1.append(ObjGraph(k, v))
 
         j = 0
-        for i in objs_list:
-            objs_list[j] = i.__dict__
+        for i in objs_list1:
+            objs_list1[j] = i.__dict__
             j = j + 1
 
 
+        for k, v in dict_sample2.items():
+            objs_list2.append(ObjGraph(k, v))
 
+        j = 0
+        for i in objs_list2:
+            objs_list2[j] = i.__dict__
+            j = j + 1
 
-
+        objs_list[0]=objs_list1
+        objs_list[1] = objs_list1
 
         return  objs_list, 200
