@@ -28,6 +28,15 @@ class Obj:
         self.x = x
         self.y = y
 
+
+
+
+class Obj2:
+    def __init__(self, date, positive,negative):
+        self.date =  date
+        self.positive = positive
+        self.negative = negative
+
 class Locations:
     def __init__(self, name, address):
         self.name = name
@@ -462,6 +471,8 @@ class GetGraphs(Resource):
 
 
 
+
+
 @rest_api.route('/api/data/graphs/location')
 class GetGraphsLocation(Resource):
     def post(self):
@@ -530,3 +541,74 @@ class GetGraphsLocation(Resource):
         return  objs_list, 200
 
 
+
+
+@rest_api.route('/api/data/graphs/discrete')
+class GetEmotions(Resource):
+    def post(self):
+        positive=0
+        negative=0
+
+
+        email_exists=False
+        password_correct = False
+
+
+        req_data = request.get_json()
+
+        _company = req_data.get("company")
+
+      #  db_add_notification_in_table(_company)
+
+        user_exists =db_get_all_data(_company)
+
+
+
+
+
+
+
+
+# словарь дата - количество посетителей
+        x_counts = {}
+        for t in user_exists:
+            print(type(t))
+
+            dictionary = json.loads(t[3].replace("'", "\""))
+            max_key = max(dictionary, key=dictionary.get)
+
+
+            if t[1] in x_counts:
+                if (max_key == 'happy'):
+                    x_counts[t[1]][0] += 1
+                else:
+                    if (max_key != 'surprise'):
+
+                        x_counts[t[1]][1] += 1
+
+
+            else:
+                x_counts[t[1]] =[0,0]
+
+                if (max_key == 'happy'):
+
+                    x_counts[t[1]][0] += 1
+                else:
+                    if (max_key != 'surprise'):
+
+                        x_counts[t[1]][1] += 1
+
+        objs_list = []
+
+        for i, item in enumerate(x_counts):
+            objs_list.append(Obj2(item, x_counts[item][0],x_counts[item][1]))
+
+
+
+        j=0
+        for i in objs_list:
+            objs_list[j]=i.__dict__
+            j=j+1
+
+
+        return  objs_list, 200
