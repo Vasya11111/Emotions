@@ -612,3 +612,62 @@ class GetEmotions(Resource):
 
 
         return  objs_list, 200
+
+
+@rest_api.route('/api/data/graphs/discrete/sex')
+class GetEmotions(Resource):
+    def post(self):
+        positive=0
+        negative=0
+
+
+        email_exists=False
+        password_correct = False
+
+
+        req_data = request.get_json()
+
+        _company = req_data.get("company")
+
+        _sex = req_data.get("sex")
+      #  db_add_notification_in_table(_company)
+
+        user_exists =db_get_all_data(_company)
+
+        dict_sample = {
+            "angry": 0,
+            "disgust": 0,
+            "fear": 0,
+            'happy': 0,
+            'sad': 0,
+            'surprise': 0,
+            'neutral': 0
+        }
+
+
+        for t in user_exists:
+
+            if (str(t[4]) == _sex):
+                dictionary = json.loads(t[3].replace("'", "\""))
+                max_key = max(dictionary, key=dictionary.get)
+                dict_sample[max_key] += 1
+
+
+
+
+        objs_list = []
+
+        for k, v in dict_sample.items():
+            objs_list.append(ObjGraph(k, v))
+
+        j = 0
+        for i in objs_list:
+            objs_list[j] = i.__dict__
+            j = j + 1
+
+
+
+
+
+
+        return  objs_list, 200
